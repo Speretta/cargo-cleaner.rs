@@ -7,24 +7,40 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            file_extension: ''
+            rename_command: 'mv'
             
           - os: ubuntu-latest
             target: i686-unknown-linux-gnu
+            file_extension: ''
+            rename_command: 'mv'
 
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
+            file_extension: ''
+            rename_command: 'mv'
             
           - os: ubuntu-latest
             target: i686-unknown-linux-musl
+            file_extension: ''
+            rename_command: 'mv'
+            
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            file_extension: ''
+            rename_command: 'mv'
 
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+            file_extension: '.exe'
+            rename_command: 'rename'
             
           - os: windows-latest
             target: i686-pc-windows-msvc
+            file_extension: '.exe'
+            rename_command: 'rename'
 
-          - os: macos-latest
-            target: x86_64-apple-darwin
+          
 
     steps:
     - name: Disable git eol translation
@@ -49,8 +65,41 @@ jobs:
         target: ${{ matrix.target }}
         override: true
 
-    - name: Release build
+    - name: Build release
       uses: actions-rs/cargo@v1
       with:
         command: build
         args: --release --all-features --target=${{ matrix.target }}
+    
+    - name: Get project name
+      uses: SebRollen/toml-action@v1.0.1
+      id: project_name
+      with:
+        file: 'Cargo.toml'
+        field: 'package.name'
+    - name: Get project version
+      uses: SebRollen/toml-action@v1.0.1
+      id: project_version
+      with:
+        file: 'Cargo.toml'
+        field: 'package.version'
+        
+    - name: Rename release build
+      run: ${{ matrix.rename_command }} 'target/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' 'target/${{ steps.project_name.outputs.value }}_${{ matrix.target }}_${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
+        
+    - name: Fetch action
+      id: pl
+      uses: Rishabh510/Path-lister-action@master
+      with:
+        path: "target/"
+        type: "*.*"
+
+    - name: Output results
+      run: |
+        echo "Found ${{ steps.pl.outputs.path_count }} file(s) with this extension:"
+        for i in ${{ steps.pl.outputs.paths }}; do
+        echo $i
+        done
+      
+      
+
