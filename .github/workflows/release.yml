@@ -84,9 +84,10 @@ jobs:
         file: 'Cargo.toml'
         field: 'package.version'
         
-    - run: ls target
+    - run: ls target/release
+    - run: ls target/${{ matrix.target }}
         
     - name: Rename release build
-      run: ${{ matrix.rename_command }} './target/release/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' './target/release/${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
+      run: ${{ matrix.rename_command }} './target/${{ matrix.target }}/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' './target/${{ matrix.target }}/${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
       
       
