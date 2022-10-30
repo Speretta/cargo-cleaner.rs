@@ -84,11 +84,12 @@ jobs:
       run: mv './target/${{ matrix.target }}/release/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' './${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
       
     - name: Publish release
-      uses: marvinpinto/action-automatic-releases@latest
+      uses: ncipollo/release-action@v1
       with:
-          repo_token: '${{ secrets.GITHUB_TOKEN }}'
-          automatic_release_tag: '${{ steps.project_version.outputs.value }}'
-          title: '${{ steps.project_name.outputs.value }} v${{ steps.project_version.outputs.value }}'
-          prerelease: false
-          files: ${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: '${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
+        name: '${{ steps.project_name.outputs.value }} v${{ steps.project_version.outputs.value }}'
+        tag: '${{ steps.project_version.outputs.value }}'
+        commit: '${{ github.base_ref }}'
+        allowUpdates: true
       
