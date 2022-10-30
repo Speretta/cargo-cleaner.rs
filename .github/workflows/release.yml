@@ -8,37 +8,30 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             file_extension: ''
-            rename_command: 'mv'
             
           - os: ubuntu-latest
             target: i686-unknown-linux-gnu
             file_extension: ''
-            rename_command: 'mv'
 
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             file_extension: ''
-            rename_command: 'mv'
             
           - os: ubuntu-latest
             target: i686-unknown-linux-musl
             file_extension: ''
-            rename_command: 'mv'
             
           - os: macos-latest
             target: x86_64-apple-darwin
             file_extension: ''
-            rename_command: 'mv'
 
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             file_extension: '.exe'
-            rename_command: 'mv'
             
           - os: windows-latest
             target: i686-pc-windows-msvc
             file_extension: '.exe'
-            rename_command: 'mv'
 
           
 
@@ -89,6 +82,6 @@ jobs:
     - run: ls target/${{ matrix.target }}/release
         
     - name: Rename release build
-      run: ${{ matrix.rename_command }} './target/${{ matrix.target }}/release/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' './target/${{ matrix.target }}/release/${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
+      run: mv'./target/${{ matrix.target }}/release/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' './${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
       
       
