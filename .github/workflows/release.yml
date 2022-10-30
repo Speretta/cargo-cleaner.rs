@@ -4,41 +4,40 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        rust: [stable]
         include:
-          - os: macOS-latest
-            rust: 'stable'
-            components: 'rustfmt, clippy'
-            targets: 'x86_64-apple-darwin'
-          - os: windows-latest
-            rust: 'stable'
-            components: 'rustfmt, clippy'
-            targets: 'x86_64-pc-windows-msvc'
           - os: ubuntu-latest
-            rust: 'stable'
-            components: 'rustfmt, clippy'
-            targets: 'x86_64-unknown-linux-musl'
+            target: x86_64-unknown-linux-gnu
+            
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
+
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          
+          - os: macos-latest
+            target: i686-apple-darwin
+
     steps:
-    - uses: hecrj/setup-rust-action@master
+    - name: Disable git eol translation
+      run: git config --global core.autocrlf false
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Release build
+      uses: actions-rs/cargo@v1
       with:
-        rust-version: ${{ matrix.rust }}
-        components: ${{ matrix.components || '' }}
-        targets: ${{ matrix.targets || '' }}
-    - name: Check Cargo availability
-      run: cargo --version
-    - name: Check Rustup default toolchain
-      run: rustup default | grep '${{ matrix.rust }}'
-    - name: Check rustfmt and clippy are available on MacOS
-      if: matrix.os == 'macOS-latest' && matrix.rust == 'stable'
-      run: |
-        cargo fmt --version
-        cargo clippy --version
-    - name: Check targets are installed correctly
-      if: matrix.rust == 'stable'
-      run: rustup target list --installed | grep '${{ matrix.targets }}'
-    - name: Build release
-      run: |
-        ls
-        cd ..
-        ls
+        command: build
+        args: --release --all-features --target=${{ matrix.target }}
