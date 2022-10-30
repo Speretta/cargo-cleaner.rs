@@ -1,0 +1,94 @@
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            file_extension: ''
+            
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+            file_extension: ''
+
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            file_extension: ''
+            
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
+            file_extension: ''
+            
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            file_extension: ''
+
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            file_extension: '.exe'
+            
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            file_extension: '.exe'
+
+    steps:
+    - name: Disable git eol translation
+      run: git config --global core.autocrlf false
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Install gcc-multilib
+      if: matrix.target == 'i686-unknown-linux-gnu'
+      run: |
+        sudo add-apt-repository --remove ppa:ubuntu-toolchain-r/test -y
+        sudo apt update
+        sudo env ACCEPT_EULA=Y apt upgrade
+        sudo apt install gcc-multilib
+    
+    - name: Install target
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        target: ${{ matrix.target }}
+        override: true
+
+    - name: Build release
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --all-features --target=${{ matrix.target }}
+    
+    - name: Get project name
+      uses: SebRollen/toml-action@v1.0.1
+      id: project_name
+      with:
+        file: 'Cargo.toml'
+        field: 'package.name'
+
+    - name: Get project version
+      uses: SebRollen/toml-action@v1.0.1
+      id: project_version
+      with:
+        file: 'Cargo.toml'
+        field: 'package.version'
+        
+    - name: Rename and move release build
+      run: mv './target/${{ matrix.target }}/release/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' './${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
+      
+    - name: Publish release
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
+          automatic_release_tag: '${{ steps.project_version.outputs.value }}'
+          title: '${{ steps.project_name.outputs.value }} v${{ steps.project_version.outputs.value }}'
+          prerelease: false
+          files: ${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}
+      
