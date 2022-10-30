@@ -33,12 +33,12 @@ jobs:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             file_extension: '.exe'
-            rename_command: 'rename'
+            rename_command: 'mv'
             
           - os: windows-latest
             target: i686-pc-windows-msvc
             file_extension: '.exe'
-            rename_command: 'rename'
+            rename_command: 'mv'
 
           
 
