@@ -1,6 +1,6 @@
 # cargo-cleaner.rs
 
-![cargo-cleaner.rs gif](https://github.com/Speretta/cargo-cleaner.rs/gif.gif)
+![cargo-cleaner.rs gif](https://github.com/Speretta/cargo-cleaner.rs/blob/master/gif.gif?raw=true)
 
 ## Why
 
