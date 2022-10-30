@@ -84,6 +84,7 @@ jobs:
         file: 'Cargo.toml'
         field: 'package.version'
         
+    - run: cd target
     - run: ls
         
     - name: Rename release build
