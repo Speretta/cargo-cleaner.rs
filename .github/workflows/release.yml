@@ -32,6 +32,15 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v3
+      
+    - name: Install gcc-multilib
+      if: matrix.target == i686-unknown-linux-gnu
+      run: |
+        sudo add-apt-repository --remove ppa:ubuntu-toolchain-r/test -y
+        sudo apt update
+        sudo env ACCEPT_EULA=Y apt upgrade
+        sudo apt-get purge gcc-5 gcc-5-base gcc-6-base
+        sudo apt install gcc-multilib
     
     - name: Install target
       uses: actions-rs/toolchain@v1
