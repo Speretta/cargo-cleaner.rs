@@ -84,20 +84,7 @@ jobs:
         file: 'Cargo.toml'
         field: 'package.version'
         
-   
-    - name: Fetch action
-      id: pl
-      uses: Rishabh510/Path-lister-action@master
-      with:
-        path: "target/"
-        type: "*.*"
-
-    - name: Output results
-      run: |
-        echo "Found ${{ steps.pl.outputs.path_count }} file(s) with this extension:"
-        for i in ${{ steps.pl.outputs.paths }}; do
-        echo $i
-        done
+    - name: Rename release build
+      run: ${{ matrix.rename_command }} 'target/release/${{ steps.project_name.outputs.value }}${{ matrix.file_extension }}' 'target/release/${{ steps.project_name.outputs.value }}_${{ matrix.target }}_v${{ steps.project_version.outputs.value }}${{ matrix.file_extension }}'
       
       
-
