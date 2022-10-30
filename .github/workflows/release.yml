@@ -38,4 +38,7 @@ jobs:
       if: matrix.rust == 'stable'
       run: rustup target list --installed | grep '${{ matrix.targets }}'
     - name: Build release
-      run: cargo build --release --target='${{ matrix.targets }}'
+      run: |
+        ls
+        cd ..
+        ls
